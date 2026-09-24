@@ -23,9 +23,9 @@ in [ROADMAP.md](ROADMAP.md).
 - Homebrew: `brew install --cask driceroland/tap/search`, and `brew upgrade` brings each new version.
 - ⌘S folds the tab bar away in its layout across the top too, as it folds the column: the page takes the whole height, and the bar comes back down over it when the pointer rests against the top edge. The View menu says Hide Tab Bar there.
 
-- An extension's OAuth sign-in is finished only by the tab it began in; a page that goes to an address shaped like the redirect is not handed over as the flow's answer.
 ### Fixed
 
+- An extension's sign-in is finished only by the tab it began in, or a window that tab opened; another page that goes to an address shaped like the sign-in's answer is no longer handed to the extension as that answer. Thanks [@Hyp4tia](https://github.com/Hyp4tia) ([#132](https://github.com/driceroland/Search/pull/132))
 - A new tab opened from a private tab is private too: ⌘T, ⌘-click on a link, ⌘D, Open Image in New Tab, and a bookmark opened with ⌘ used to open an ordinary tab, which kept the page in the history. A link or duplicate stays signed in to what the private tab was ([#121](https://github.com/driceroland/Search/issues/121)) Thanks [@PeterTheMango](https://github.com/PeterTheMango) ([#122](https://github.com/driceroland/Search/pull/122))
 - Pages are told the Safari version this Mac has, not a fixed Safari 26.5: on an older macOS, a site trusting that number could send code its WebKit can't run. Thanks [@peter-bf](https://github.com/peter-bf) ([#110](https://github.com/driceroland/Search/pull/110))
 - Passwords, Bookmarks and the welcome screen find the browsers to bring things over from without walking through their caches: a few milliseconds instead of twenty, each time those lists are drawn. Thanks [@dttdrv](https://github.com/dttdrv) ([#156](https://github.com/driceroland/Search/pull/156))

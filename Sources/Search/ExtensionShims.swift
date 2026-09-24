@@ -74,7 +74,7 @@ enum ExtensionShims {
         // script or a module, where a wrapper importing it would not.
         if var background = manifest["background"] as? [String: Any] {
             // A manifest is not a way out of its own package: a worker path
-            // that resolves outside the folder is left alone.
+            // that resolves outside the folder, or is a link, is left alone.
             if let worker = background["service_worker"] as? String,
                let path = inside(worker, of: folder) {
                 if var source = try? String(contentsOf: path, encoding: .utf8) {
@@ -135,10 +135,18 @@ enum ExtensionShims {
     }
 
     /// A path a package names, resolved and kept inside the folder it came
-    /// in: `..` in a manifest is not a way out of the package.
+    /// in: `..` in a manifest is not a way out of the package. Nor is a
+    /// symbolic link, which a folder install keeps as it is: the worker is
+    /// read through it and written back over it as a regular file, so a
+    /// link to a file elsewhere would put that file's bytes in the package.
+    /// A folder on the way that is a link is caught by where it resolves.
     nonisolated private static func inside(_ name: String, of folder: URL) -> URL? {
         let path = folder.appendingPathComponent(name.trimmingCharacters(in: CharacterSet(charactersIn: "/"))).standardizedFileURL
-        return path.path.hasPrefix(folder.standardizedFileURL.path + "/") ? path : nil
+        guard path.path.hasPrefix(folder.standardizedFileURL.path + "/"),
+              (try? path.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) != true,
+              path.resolvingSymlinksInPath().path.hasPrefix(folder.resolvingSymlinksInPath().path + "/")
+        else { return nil }
+        return path
     }
 
     /// The shim as this extension gets it: with the events its code mentions

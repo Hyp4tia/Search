@@ -23,9 +23,9 @@ in [ROADMAP.md](ROADMAP.md).
 - Homebrew: `brew install --cask driceroland/tap/search`, and `brew upgrade` brings each new version.
 - ⌘S folds the tab bar away in its layout across the top too, as it folds the column: the page takes the whole height, and the bar comes back down over it when the pointer rests against the top edge. The View menu says Hide Tab Bar there.
 
-- A right-click on an image only offers to open, copy or download it when its address is http, https or data; anything else a page names is ignored.
 ### Fixed
 
+- A right-click on an image offers Search's own menu to open, copy or download it only when its address is http, https, data or blob; for any other address a page names, WebKit's own menu shows instead. Thanks [@Hyp4tia](https://github.com/Hyp4tia) ([#131](https://github.com/driceroland/Search/pull/131))
 - A new tab opened from a private tab is private too: ⌘T, ⌘-click on a link, ⌘D, Open Image in New Tab, and a bookmark opened with ⌘ used to open an ordinary tab, which kept the page in the history. A link or duplicate stays signed in to what the private tab was ([#121](https://github.com/driceroland/Search/issues/121)) Thanks [@PeterTheMango](https://github.com/PeterTheMango) ([#122](https://github.com/driceroland/Search/pull/122))
 - Pages are told the Safari version this Mac has, not a fixed Safari 26.5: on an older macOS, a site trusting that number could send code its WebKit can't run. Thanks [@peter-bf](https://github.com/peter-bf) ([#110](https://github.com/driceroland/Search/pull/110))
 - Passwords, Bookmarks and the welcome screen find the browsers to bring things over from without walking through their caches: a few milliseconds instead of twenty, each time those lists are drawn. Thanks [@dttdrv](https://github.com/dttdrv) ([#156](https://github.com/driceroland/Search/pull/156))

@@ -20,6 +20,7 @@ in [ROADMAP.md](ROADMAP.md).
 - Homebrew: `brew install --cask driceroland/tap/search`, and `brew upgrade` brings each new version.
 - ⌘S folds the tab bar away in its layout across the top too, as it folds the column: the page takes the whole height, and the bar comes back down over it when the pointer rests against the top edge. The View menu says Hide Tab Bar there.
 
+- `./bench` answers only for the tabs it opened itself: a script on this Mac can no longer read, click in, or put to sleep a tab you are using.
 ### Fixed
 
 - The stand-in traffic lights drawn while Search is in the background are no longer redrawn each time the window changes screen or size, only when they move.

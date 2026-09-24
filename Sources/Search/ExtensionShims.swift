@@ -2210,11 +2210,7 @@ enum ExtensionShims {
     /// browser knows about the person using it. WebKit keeps no permission
     /// object for them, they are the APIs this shim exists to supply, so the
     /// gate reads the names the extension's own manifest asked for.
-    /// `tabs.describe` is the one call inside a family WebKit does own where
-    /// the permission guards reading a tab rather than moving or selecting
-    /// it.
     private static let gates: [String: String] = [
-        "tabs.describe": "tabs",
         "bookmarks": "bookmarks",
         "history": "history",
         "downloads": "downloads",
@@ -2227,16 +2223,11 @@ enum ExtensionShims {
     /// What this extension asked for: the names in its manifest and any
     /// optional ones granted since. The checks inside the shim are a
     /// courtesy to honest code, the shim runs beside the extension's own,
-    /// so the one that counts is here.
-    private static func allowed(_ id: String) -> Set<String> {
-        var names = Store.settings.stringArray(forKey: "extensions.granted.\(id)") ?? []
-        let manifest = Extensions.folder(for: id).appendingPathComponent("manifest.json")
-        if let data = try? Data(contentsOf: manifest),
-           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
-           let asked = json["permissions"] as? [Any] {
-            names += asked.compactMap { $0 as? String }
-        }
-        return Set(names)
+    /// so the one that counts is here. The manifest is the one WebKit
+    /// already holds, not the file read again on every call.
+    private static func allowed(_ id: String, context: WKWebExtensionContext) -> Set<String> {
+        let asked = (context.webExtension.manifest["permissions"] as? [Any] ?? []).compactMap { $0 as? String }
+        return Set(asked + (Store.settings.stringArray(forKey: "extensions.granted.\(id)") ?? []))
     }
 
     private static func run(_ api: String, _ args: [Any], context: WKWebExtensionContext, owner: Extensions) async throws -> Any? {
@@ -2250,8 +2241,14 @@ enum ExtensionShims {
         // the shim runs beside the extension's own code, so its checks stop
         // only the honest. A family this extension never asked for is an
         // error, the way Chrome answers a call to an API it lacks.
-        if let needed = gates[api] ?? gates[String(api.prefix(while: { $0 != "." }))],
-           !allowed(id).contains(needed) {
+        // `tabs.describe` is the one call inside a family WebKit does own
+        // where the permission guards reading a tab rather than moving or
+        // selecting it. WebKit keeps that permission, optional grants
+        // included, so it is asked.
+        if api == "tabs.describe", !context.hasPermission(.tabs) {
+            throw Unsupported(what: "The extension never asked for \u{201C}tabs\u{201D}")
+        }
+        if let needed = gates[String(api.prefix(while: { $0 != "." }))], !allowed(id, context: context).contains(needed) {
             throw Unsupported(what: "The extension never asked for \u{201C}\(needed)\u{201D}")
         }
 
